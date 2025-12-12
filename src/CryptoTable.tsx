@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 
 interface Cryptocurrency {
   id: string;
@@ -70,13 +70,15 @@ const CryptoTable: React.FC = () => {
     return `text-right ${value >= 0 ? 'price-change-positive' : 'price-change-negative'}`;
   };
 
-  const filteredCryptos = cryptos.filter((crypto) => {
-    const searchLower = searchQuery.toLowerCase();
-    return (
-      crypto.name.toLowerCase().includes(searchLower) ||
-      crypto.symbol.toLowerCase().includes(searchLower)
-    );
-  });
+  const filteredCryptos = useMemo(() => {
+    return cryptos.filter((crypto) => {
+      const searchLower = searchQuery.toLowerCase();
+      return (
+        crypto.name.toLowerCase().includes(searchLower) ||
+        crypto.symbol.toLowerCase().includes(searchLower)
+      );
+    });
+  }, [cryptos, searchQuery]);
 
   if (loading) {
     return <div className="loading">Loading cryptocurrency data...</div>;
