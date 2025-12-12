@@ -12,6 +12,15 @@ interface Cryptocurrency {
   total_volume: number;
 }
 
+// API Configuration
+const COINGECKO_API_URL = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=false';
+
+// Formatting Constants
+const SMALL_PRICE_DECIMALS = 6; // For cryptocurrency prices under $1
+const TRILLION_THRESHOLD = 1e12;
+const BILLION_THRESHOLD = 1e9;
+const MILLION_THRESHOLD = 1e6;
+
 const Homepage: React.FC = () => {
   const [cryptos, setCryptos] = useState<Cryptocurrency[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -21,9 +30,7 @@ const Homepage: React.FC = () => {
     const fetchCryptos = async () => {
       try {
         setLoading(true);
-        const response = await fetch(
-          'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=false'
-        );
+        const response = await fetch(COINGECKO_API_URL);
         
         if (!response.ok) {
           throw new Error('Failed to fetch cryptocurrency data');
@@ -46,18 +53,19 @@ const Homepage: React.FC = () => {
     if (price >= 1) {
       return `$${price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     }
-    return `$${price.toFixed(6)}`;
+    // Use more decimal places for small-value cryptocurrencies
+    return `$${price.toFixed(SMALL_PRICE_DECIMALS)}`;
   };
 
   const formatLargeNumber = (num: number): string => {
-    if (num >= 1e12) {
-      return `$${(num / 1e12).toFixed(2)}T`;
+    if (num >= TRILLION_THRESHOLD) {
+      return `$${(num / TRILLION_THRESHOLD).toFixed(2)}T`;
     }
-    if (num >= 1e9) {
-      return `$${(num / 1e9).toFixed(2)}B`;
+    if (num >= BILLION_THRESHOLD) {
+      return `$${(num / BILLION_THRESHOLD).toFixed(2)}B`;
     }
-    if (num >= 1e6) {
-      return `$${(num / 1e6).toFixed(2)}M`;
+    if (num >= MILLION_THRESHOLD) {
+      return `$${(num / MILLION_THRESHOLD).toFixed(2)}M`;
     }
     return `$${num.toLocaleString()}`;
   };
