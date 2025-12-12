@@ -43,7 +43,7 @@ const CryptoTable: React.FC = () => {
   }, []);
 
   const formatNumber = (num: number): string => {
-    if (num == null) return 'N/A';
+    if (num == null || num === undefined) return 'N/A';
     if (num >= 1e12) {
       return `$${(num / 1e12).toFixed(2)}T`;
     }
@@ -57,11 +57,16 @@ const CryptoTable: React.FC = () => {
   };
 
   const formatPrice = (price: number): string => {
-    if (price == null) return 'N/A';
+    if (price == null || price === undefined) return 'N/A';
     if (price >= 1) {
       return `$${price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     }
     return `$${price.toFixed(6)}`;
+  };
+
+  const getPriceChangeClass = (value: number | null | undefined): string => {
+    if (value == null || value === undefined) return 'text-right';
+    return `text-right ${value >= 0 ? 'price-change-positive' : 'price-change-negative'}`;
   };
 
   if (loading) {
@@ -99,8 +104,8 @@ const CryptoTable: React.FC = () => {
                 </div>
               </td>
               <td className="text-right">{formatPrice(crypto.current_price)}</td>
-              <td className={`text-right ${crypto.price_change_percentage_24h != null && crypto.price_change_percentage_24h >= 0 ? 'price-change-positive' : 'price-change-negative'}`}>
-                {crypto.price_change_percentage_24h != null ? (
+              <td className={getPriceChangeClass(crypto.price_change_percentage_24h)}>
+                {crypto.price_change_percentage_24h != null && crypto.price_change_percentage_24h !== undefined ? (
                   <>
                     {crypto.price_change_percentage_24h >= 0 ? '+' : ''}
                     {crypto.price_change_percentage_24h.toFixed(2)}%
