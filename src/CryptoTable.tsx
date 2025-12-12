@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import './CryptoTable.css';
 import { mockCryptoData } from './mockData';
 
@@ -73,6 +73,10 @@ const CryptoTable: React.FC = () => {
     return `${percentage >= 0 ? '+' : ''}${percentage.toFixed(2)}%`;
   };
 
+  const totalMarketCap = useMemo(() => {
+    return cryptoData.reduce((sum, crypto) => sum + crypto.market_cap, 0);
+  }, [cryptoData]);
+
   if (loading) {
     return (
       <div className="crypto-container">
@@ -93,7 +97,7 @@ const CryptoTable: React.FC = () => {
     <div className="crypto-container">
       <header className="crypto-header">
         <h1>Today's Cryptocurrency Prices by Market Cap</h1>
-        <p className="subtitle">The global crypto market cap is {formatLargeNumber(cryptoData.reduce((sum, crypto) => sum + crypto.market_cap, 0))}</p>
+        <p className="subtitle">The global crypto market cap is {formatLargeNumber(totalMarketCap)}</p>
       </header>
       
       <div className="table-wrapper">
