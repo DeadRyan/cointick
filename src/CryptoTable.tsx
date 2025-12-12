@@ -43,6 +43,7 @@ const CryptoTable: React.FC = () => {
   }, []);
 
   const formatNumber = (num: number): string => {
+    if (num == null) return 'N/A';
     if (num >= 1e12) {
       return `$${(num / 1e12).toFixed(2)}T`;
     }
@@ -56,6 +57,7 @@ const CryptoTable: React.FC = () => {
   };
 
   const formatPrice = (price: number): string => {
+    if (price == null) return 'N/A';
     if (price >= 1) {
       return `$${price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     }
@@ -89,7 +91,7 @@ const CryptoTable: React.FC = () => {
               <td>{crypto.market_cap_rank}</td>
               <td>
                 <div className="crypto-name">
-                  <img src={crypto.image} alt={crypto.name} className="crypto-logo" />
+                  <img src={crypto.image} alt={`${crypto.name} logo`} className="crypto-logo" />
                   <span>
                     {crypto.name}
                     <span className="crypto-symbol">{crypto.symbol}</span>
@@ -97,9 +99,13 @@ const CryptoTable: React.FC = () => {
                 </div>
               </td>
               <td className="text-right">{formatPrice(crypto.current_price)}</td>
-              <td className={`text-right ${crypto.price_change_percentage_24h >= 0 ? 'price-change-positive' : 'price-change-negative'}`}>
-                {crypto.price_change_percentage_24h >= 0 ? '+' : ''}
-                {crypto.price_change_percentage_24h.toFixed(2)}%
+              <td className={`text-right ${crypto.price_change_percentage_24h != null && crypto.price_change_percentage_24h >= 0 ? 'price-change-positive' : 'price-change-negative'}`}>
+                {crypto.price_change_percentage_24h != null ? (
+                  <>
+                    {crypto.price_change_percentage_24h >= 0 ? '+' : ''}
+                    {crypto.price_change_percentage_24h.toFixed(2)}%
+                  </>
+                ) : 'N/A'}
               </td>
               <td className="text-right">{formatNumber(crypto.market_cap)}</td>
               <td className="text-right">{formatNumber(crypto.total_volume)}</td>
