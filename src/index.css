@@ -5,9 +5,188 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: #1a1a2e;
+  color: #eaeaea;
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Dark theme container */
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Table styles */
+.crypto-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #16213e;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.crypto-table thead {
+  background-color: #0f3460;
+}
+
+.crypto-table th {
+  padding: 16px;
+  text-align: left;
+  font-weight: 600;
+  color: #eaeaea;
+  border-bottom: 2px solid #1a1a2e;
+}
+
+.crypto-table th:first-child {
+  text-align: center;
+  width: 60px;
+}
+
+.crypto-table tbody tr {
+  border-bottom: 1px solid #1a1a2e;
+  transition: background-color 0.2s;
+}
+
+.crypto-table tbody tr:hover {
+  background-color: #1a2332;
+}
+
+.crypto-table td {
+  padding: 16px;
+  color: #eaeaea;
+}
+
+.crypto-table td:first-child {
+  text-align: center;
+  font-weight: 600;
+  color: #9a9a9a;
+}
+
+/* Coin name cell */
+.coin-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.coin-logo {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+}
+
+.coin-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.coin-name {
+  font-weight: 600;
+  color: #eaeaea;
+}
+
+.coin-symbol {
+  font-size: 12px;
+  color: #9a9a9a;
+  text-transform: uppercase;
+}
+
+/* Price change colors */
+.positive {
+  color: #16c784;
+}
+
+.negative {
+  color: #ea3943;
+}
+
+/* Loading and error states */
+.loading,
+.error {
+  text-align: center;
+  padding: 40px;
+  font-size: 18px;
+}
+
+.error {
+  color: #ea3943;
+}
+
+/* Header */
+.header {
+  text-align: center;
+  padding: 40px 20px;
+  background: linear-gradient(135deg, #0f3460 0%, #16213e 100%);
+  margin: -20px -20px 20px -20px;
+  border-radius: 0 0 8px 8px;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 36px;
+  color: #eaeaea;
+  font-weight: 700;
+}
+
+.header p {
+  margin: 10px 0 0 0;
+  color: #9a9a9a;
+  font-size: 16px;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .container {
+    padding: 10px;
+  }
+
+  .header {
+    margin: -10px -10px 10px -10px;
+    padding: 20px 10px;
+  }
+
+  .header h1 {
+    font-size: 24px;
+  }
+
+  .header p {
+    font-size: 14px;
+  }
+
+  .crypto-table th,
+  .crypto-table td {
+    padding: 8px 4px;
+    font-size: 12px;
+  }
+
+  .coin-logo {
+    width: 24px;
+    height: 24px;
+  }
+
+  .coin-name-cell {
+    gap: 6px;
+  }
+
+  .coin-symbol {
+    display: none;
+  }
+
+  /* Hide some columns on mobile */
+  .crypto-table th:nth-child(5),
+  .crypto-table td:nth-child(5),
+  .crypto-table th:nth-child(6),
+  .crypto-table td:nth-child(6) {
+    display: none;
+  }
 }
