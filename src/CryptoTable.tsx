@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 
 interface Cryptocurrency {
   id: string;
@@ -16,6 +16,7 @@ const CryptoTable: React.FC = () => {
   const [cryptos, setCryptos] = useState<Cryptocurrency[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState<string>('');
 
   useEffect(() => {
     const fetchCryptoData = async () => {
@@ -69,6 +70,16 @@ const CryptoTable: React.FC = () => {
     return `text-right ${value >= 0 ? 'price-change-positive' : 'price-change-negative'}`;
   };
 
+  const filteredCryptos = useMemo(() => {
+    return cryptos.filter((crypto) => {
+      const searchLower = searchQuery.toLowerCase();
+      return (
+        crypto.name.toLowerCase().includes(searchLower) ||
+        crypto.symbol.toLowerCase().includes(searchLower)
+      );
+    });
+  }, [cryptos, searchQuery]);
+
   if (loading) {
     return <div className="loading">Loading cryptocurrency data...</div>;
   }
@@ -79,6 +90,13 @@ const CryptoTable: React.FC = () => {
 
   return (
     <div className="container">
+      <input
+        type="text"
+        className="search-input"
+        placeholder="Search cryptocurrencies..."
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+      />
       <table className="crypto-table">
         <thead>
           <tr>
@@ -91,7 +109,7 @@ const CryptoTable: React.FC = () => {
           </tr>
         </thead>
         <tbody>
-          {cryptos.map((crypto) => (
+          {filteredCryptos.map((crypto) => (
             <tr key={crypto.id}>
               <td>{crypto.market_cap_rank}</td>
               <td>
