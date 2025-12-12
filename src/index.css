@@ -5,9 +5,145 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: #1a1a1a;
+  color: #ffffff;
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.header {
+  text-align: center;
+  padding: 40px 20px 30px;
+  background-color: #0d0d0d;
+  margin-bottom: 30px;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 2.5rem;
+  font-weight: 700;
+  background: linear-gradient(90deg, #3861fb, #e83e8c);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.crypto-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #0d0d0d;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.crypto-table thead {
+  background-color: #2a2a2a;
+}
+
+.crypto-table th {
+  padding: 15px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #a0a0a0;
+}
+
+.crypto-table td {
+  padding: 15px;
+  border-top: 1px solid #2a2a2a;
+}
+
+.crypto-table tbody tr {
+  transition: background-color 0.2s;
+}
+
+.crypto-table tbody tr:hover {
+  background-color: #1a1a1a;
+}
+
+.crypto-name {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.crypto-logo {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+}
+
+.crypto-symbol {
+  color: #a0a0a0;
+  font-size: 0.875rem;
+  margin-left: 5px;
+  text-transform: uppercase;
+}
+
+.price-change-positive {
+  color: #16c784;
+}
+
+.price-change-negative {
+  color: #ea3943;
+}
+
+.loading {
+  text-align: center;
+  padding: 50px;
+  font-size: 1.2rem;
+  color: #a0a0a0;
+}
+
+.error {
+  text-align: center;
+  padding: 50px;
+  font-size: 1.2rem;
+  color: #ea3943;
+}
+
+.text-right {
+  text-align: right;
+}
+
+@media (max-width: 768px) {
+  .header h1 {
+    font-size: 1.8rem;
+  }
+
+  .crypto-table {
+    font-size: 0.875rem;
+  }
+
+  .crypto-table th,
+  .crypto-table td {
+    padding: 10px 8px;
+  }
+
+  .crypto-logo {
+    width: 24px;
+    height: 24px;
+  }
+
+  .crypto-table th:nth-child(5),
+  .crypto-table td:nth-child(5),
+  .crypto-table th:nth-child(6),
+  .crypto-table td:nth-child(6) {
+    display: none;
+  }
 }
