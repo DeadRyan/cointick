@@ -12,7 +12,11 @@ interface Cryptocurrency {
   market_cap_rank: number;
 }
 
-const CryptoTable: React.FC = () => {
+interface CryptoTableProps {
+  showSearch: boolean;
+}
+
+const CryptoTable: React.FC<CryptoTableProps> = ({ showSearch }) => {
   const [cryptos, setCryptos] = useState<Cryptocurrency[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -90,13 +94,15 @@ const CryptoTable: React.FC = () => {
 
   return (
     <div className="container">
-      <input
-        type="text"
-        className="search-input"
-        placeholder="Search cryptocurrencies..."
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-      />
+      {showSearch && (
+        <input
+          type="text"
+          className="search-input"
+          placeholder="Search cryptocurrencies..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+      )}
       <table className="crypto-table">
         <thead>
           <tr>
