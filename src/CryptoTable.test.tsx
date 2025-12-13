@@ -43,7 +43,9 @@ const mockCryptos = [
 ];
 
 const mockKWEPriceResponse = {
-  price: 0.0025,
+  result: {
+    last: 0.0025,
+  },
 };
 
 describe('CryptoTable', () => {

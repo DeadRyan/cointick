@@ -1,5 +1,7 @@
 export interface KWEPriceResponse {
-  price: number;
+  result: {
+    last: number;
+  };
 }
 
 export const fetchKWEPrice = async (): Promise<number> => {
@@ -11,5 +13,5 @@ export const fetchKWEPrice = async (): Promise<number> => {
   
   const data: KWEPriceResponse = await response.json();
   
-  return data.price || 0;
+  return data.result.last || 0;
 };
