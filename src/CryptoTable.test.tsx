@@ -146,4 +146,29 @@ describe('CryptoTable', () => {
     expect(screen.queryByText('Ethereum')).not.toBeInTheDocument();
     expect(screen.queryByText('Cardano')).not.toBeInTheDocument();
   });
+
+  test('displays KWE cryptocurrency at the top of the list', async () => {
+    render(<CryptoTable showSearch={false} />);
+    
+    await waitFor(() => {
+      expect(screen.getByText('KWE Network')).toBeInTheDocument();
+    });
+    
+    // Verify KWE is displayed
+    expect(screen.getByText('KWE Network')).toBeInTheDocument();
+  });
+
+  test('KWE can be filtered by search', async () => {
+    render(<CryptoTable showSearch={true} />);
+    
+    await waitFor(() => {
+      expect(screen.getByText('KWE Network')).toBeInTheDocument();
+    });
+    
+    const searchInput = screen.getByPlaceholderText(/Search cryptocurrencies.../i);
+    await userEvent.type(searchInput, 'kwe');
+    
+    expect(screen.getByText('KWE Network')).toBeInTheDocument();
+    expect(screen.queryByText('Bitcoin')).not.toBeInTheDocument();
+  });
 });

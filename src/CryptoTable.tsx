@@ -9,7 +9,7 @@ interface Cryptocurrency {
   price_change_percentage_24h: number;
   market_cap: number;
   total_volume: number;
-  market_cap_rank: number;
+  market_cap_rank: number | null;
 }
 
 interface CryptoTableProps {
@@ -35,7 +35,22 @@ const CryptoTable: React.FC<CryptoTableProps> = ({ showSearch }) => {
         }
         
         const data = await response.json();
-        setCryptos(data);
+        
+        // Add KWE cryptocurrency with placeholder data
+        const kweData: Cryptocurrency = {
+          id: 'kwe',
+          name: 'KWE Network',
+          symbol: 'kwe',
+          image: '/kwe-logo.svg',
+          current_price: 0.0025,
+          price_change_percentage_24h: 3.45,
+          market_cap: 1250000,
+          total_volume: 75000,
+          market_cap_rank: null,
+        };
+        
+        // Add KWE at the top of the list
+        setCryptos([kweData, ...data]);
         setError(null);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An error occurred');
@@ -117,7 +132,7 @@ const CryptoTable: React.FC<CryptoTableProps> = ({ showSearch }) => {
         <tbody>
           {filteredCryptos.map((crypto) => (
             <tr key={crypto.id}>
-              <td>{crypto.market_cap_rank}</td>
+              <td>{crypto.market_cap_rank || '-'}</td>
               <td>
                 <div className="crypto-name">
                   <img src={crypto.image} alt={`${crypto.name} logo`} className="crypto-logo" />
