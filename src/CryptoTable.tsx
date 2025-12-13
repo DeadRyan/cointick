@@ -65,20 +65,44 @@ const CryptoTable: React.FC<CryptoTableProps> = ({ showSearch }) => {
       try {
         setLoading(true);
         
-        // Fetch KWE data and CoinGecko data in parallel
-        const [kweData, coingeckoResponse] = await Promise.all([
+        // Fetch KWE data and all 8 pages of CoinGecko data in parallel
+        const pages = [1, 2, 3, 4, 5, 6, 7, 8];
+        const fetchPromises = pages.map(page =>
+          fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=${page}&sparkline=false`)
+        );
+        
+        const [kweData, ...coingeckoResponses] = await Promise.all([
           fetchKWEData(),
-          fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=false')
+          ...fetchPromises
         ]);
         
-        if (!coingeckoResponse.ok) {
-          throw new Error('Failed to fetch cryptocurrency data');
+        // Check if any response failed
+        for (const response of coingeckoResponses) {
+          if (!response.ok) {
+            throw new Error('Failed to fetch cryptocurrency data');
+          }
         }
         
-        const data = await coingeckoResponse.json();
+        // Parse all responses
+        const dataArrays = await Promise.all(
+          coingeckoResponses.map(response => response.json())
+        );
+        
+        // Flatten and sort by market cap
+        const allCoins = dataArrays.flat();
+        
+        // Deduplicate by coin ID (in case of overlapping pages or duplicates)
+        const uniqueCoins = Array.from(
+          new Map(allCoins.map(coin => [coin.id, coin])).values()
+        );
+        
+        // Sort by market cap
+        uniqueCoins.sort((a, b) => {
+          return (b.market_cap || 0) - (a.market_cap || 0);
+        });
         
         // Add KWE at the top of the list
-        setCryptos([kweData, ...data]);
+        setCryptos([kweData, ...uniqueCoins]);
         setError(null);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An error occurred');

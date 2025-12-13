@@ -59,7 +59,14 @@ describe('CryptoTable', () => {
           json: async () => mockKWEPriceResponse,
         });
       }
-      // Mock CoinGecko API response
+      // Mock CoinGecko API response - all 8 pages return the same mock data
+      if (url.includes('coingecko.com')) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => mockCryptos,
+        });
+      }
+      // Fallback
       return Promise.resolve({
         ok: true,
         json: async () => mockCryptos,
