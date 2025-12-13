@@ -12,6 +12,24 @@ interface Cryptocurrency {
   market_cap_rank: number | null;
 }
 
+interface CoinrankingCoin {
+  uuid: string;
+  name: string;
+  symbol: string;
+  iconUrl: string;
+  price: string;
+  change: string;
+  marketCap: string;
+  '24hVolume': string;
+  rank: number;
+}
+
+interface CoinrankingResponse {
+  data: {
+    coins: CoinrankingCoin[];
+  };
+}
+
 interface CryptoTableProps {
   showSearch: boolean;
 }
@@ -23,31 +41,65 @@ const CryptoTable: React.FC<CryptoTableProps> = ({ showSearch }) => {
   const [searchQuery, setSearchQuery] = useState<string>('');
 
   useEffect(() => {
+    const fetchKWEData = async (): Promise<Cryptocurrency> => {
+      try {
+        // Try to fetch real-time KWE data from Coinranking API
+        const response = await fetch('https://api.coinranking.com/v2/coins?search=kwe&limit=1');
+        
+        if (response.ok) {
+          const data: CoinrankingResponse = await response.json();
+          
+          // Check if KWE coin was found in the response
+          if (data.data?.coins && data.data.coins.length > 0) {
+            const kweCoin = data.data.coins[0];
+            
+            // Map Coinranking data to our Cryptocurrency interface
+            return {
+              id: 'kwe',
+              name: kweCoin.name || 'KWE Network',
+              symbol: kweCoin.symbol?.toLowerCase() || 'kwe',
+              image: kweCoin.iconUrl || '/kwe-logo.svg',
+              current_price: parseFloat(kweCoin.price) || 0.0025,
+              price_change_percentage_24h: parseFloat(kweCoin.change) || 0,
+              market_cap: parseFloat(kweCoin.marketCap) || 1250000,
+              total_volume: parseFloat(kweCoin['24hVolume']) || 75000,
+              market_cap_rank: kweCoin.rank || null,
+            };
+          }
+        }
+      } catch (error) {
+        // Fall back to placeholder data if API request fails
+      }
+      
+      // Fallback to placeholder data
+      return {
+        id: 'kwe',
+        name: 'KWE Network',
+        symbol: 'kwe',
+        image: '/kwe-logo.svg',
+        current_price: 0.0025,
+        price_change_percentage_24h: 3.45,
+        market_cap: 1250000,
+        total_volume: 75000,
+        market_cap_rank: null,
+      };
+    };
+
     const fetchCryptoData = async () => {
       try {
         setLoading(true);
-        const response = await fetch(
-          'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=false'
-        );
         
-        if (!response.ok) {
+        // Fetch KWE data and CoinGecko data in parallel
+        const [kweData, coingeckoResponse] = await Promise.all([
+          fetchKWEData(),
+          fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=false')
+        ]);
+        
+        if (!coingeckoResponse.ok) {
           throw new Error('Failed to fetch cryptocurrency data');
         }
         
-        const data = await response.json();
-        
-        // Add KWE cryptocurrency with placeholder data
-        const kweData: Cryptocurrency = {
-          id: 'kwe',
-          name: 'KWE Network',
-          symbol: 'kwe',
-          image: '/kwe-logo.svg',
-          current_price: 0.0025,
-          price_change_percentage_24h: 3.45,
-          market_cap: 1250000,
-          total_volume: 75000,
-          market_cap_rank: null,
-        };
+        const data = await coingeckoResponse.json();
         
         // Add KWE at the top of the list
         setCryptos([kweData, ...data]);
