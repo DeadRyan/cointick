@@ -42,33 +42,19 @@ const mockCryptos = [
   },
 ];
 
-const mockKWECoinrankingResponse = {
-  data: {
-    coins: [
-      {
-        uuid: 'kwe-uuid',
-        symbol: 'KWE',
-        name: 'KWE Network',
-        iconUrl: 'https://example.com/kwe.png',
-        price: '0.0025',
-        change: '3.45',
-        marketCap: '1250000',
-        '24hVolume': '75000',
-        rank: 500,
-      },
-    ],
-  },
+const mockKWEPriceResponse = {
+  price: 0.0025,
 };
 
 describe('CryptoTable', () => {
   beforeEach(() => {
-    // Default mock for CoinGecko API
+    // Default mock for APIs
     (global.fetch as jest.Mock).mockImplementation((url: string) => {
-      if (url.startsWith('https://api.coinranking.com')) {
-        // Mock Coinranking API response
+      if (url.startsWith('https://kwepriceticker.com')) {
+        // Mock KWE Price Ticker API response
         return Promise.resolve({
           ok: true,
-          json: async () => mockKWECoinrankingResponse,
+          json: async () => mockKWEPriceResponse,
         });
       }
       // Mock CoinGecko API response
@@ -201,26 +187,26 @@ describe('CryptoTable', () => {
     expect(screen.queryByText('Bitcoin')).not.toBeInTheDocument();
   });
 
-  test('fetches KWE data from Coinranking API when available', async () => {
+  test('fetches KWE data from PriceTicker API when available', async () => {
     render(<CryptoTable showSearch={false} />);
     
     await waitFor(() => {
       expect(screen.getByText('KWE Network')).toBeInTheDocument();
     });
     
-    // Verify Coinranking API was called
+    // Verify PriceTicker API was called
     expect(global.fetch).toHaveBeenCalledWith(
-      'https://api.coinranking.com/v2/coins?search=kwe&limit=1'
+      'https://kwepriceticker.com/api/price'
     );
     
     // Verify KWE is displayed at the top
     expect(screen.getByText('KWE Network')).toBeInTheDocument();
   });
 
-  test('falls back to placeholder data when Coinranking API fails', async () => {
-    // Mock API failure for Coinranking
+  test('falls back to placeholder data when PriceTicker API fails', async () => {
+    // Mock API failure for PriceTicker
     (global.fetch as jest.Mock).mockImplementation((url: string) => {
-      if (url.startsWith('https://api.coinranking.com')) {
+      if (url.startsWith('https://kwepriceticker.com')) {
         return Promise.resolve({
           ok: false,
           json: async () => ({}),
