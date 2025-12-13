@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { fetchKWEPrice } from './PriceTicker';
 
 interface Cryptocurrency {
   id: string;
@@ -12,24 +13,6 @@ interface Cryptocurrency {
   market_cap_rank: number | null;
 }
 
-interface CoinrankingCoin {
-  uuid: string;
-  name: string;
-  symbol: string;
-  iconUrl: string;
-  price: string;
-  change: string;
-  marketCap: string;
-  '24hVolume': string;
-  rank: number;
-}
-
-interface CoinrankingResponse {
-  data: {
-    coins: CoinrankingCoin[];
-  };
-}
-
 interface CryptoTableProps {
   showSearch: boolean;
 }
@@ -39,50 +22,43 @@ const CryptoTable: React.FC<CryptoTableProps> = ({ showSearch }) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [kwePrice, setKwePrice] = useState<number>(0);
 
   useEffect(() => {
     const fetchKWEData = async (): Promise<Cryptocurrency> => {
       try {
-        // Try to fetch real-time KWE data from Coinranking API
-        const response = await fetch('https://api.coinranking.com/v2/coins?search=kwe&limit=1');
+        // Fetch KWE price from the PriceTicker API
+        const price = await fetchKWEPrice();
         
-        if (response.ok) {
-          const data: CoinrankingResponse = await response.json();
-          
-          // Check if KWE coin was found in the response
-          if (data.data?.coins && data.data.coins.length > 0) {
-            const kweCoin = data.data.coins[0];
-            
-            // Map Coinranking data to our Cryptocurrency interface
-            return {
-              id: 'kwe',
-              name: kweCoin.name || 'KWE Network',
-              symbol: kweCoin.symbol?.toLowerCase() || 'kwe',
-              image: kweCoin.iconUrl || '/kwe-logo.svg',
-              current_price: parseFloat(kweCoin.price) || 0.0025,
-              price_change_percentage_24h: parseFloat(kweCoin.change) || 0,
-              market_cap: parseFloat(kweCoin.marketCap) || 1250000,
-              total_volume: parseFloat(kweCoin['24hVolume']) || 75000,
-              market_cap_rank: kweCoin.rank || null,
-            };
-          }
-        }
+        // Update the KWE price state for periodic updates
+        setKwePrice(price);
+        
+        // Return KWE data with the fetched price
+        return {
+          id: 'kwe',
+          name: 'KWE Network',
+          symbol: 'kwe',
+          image: '/kwe-logo.svg',
+          current_price: price,
+          price_change_percentage_24h: 0, // N/A - not available from API
+          market_cap: 0, // N/A - not available from API
+          total_volume: 0, // N/A - not available from API
+          market_cap_rank: null,
+        };
       } catch (error) {
         // Fall back to placeholder data if API request fails
+        return {
+          id: 'kwe',
+          name: 'KWE Network',
+          symbol: 'kwe',
+          image: '/kwe-logo.svg',
+          current_price: 0,
+          price_change_percentage_24h: 0,
+          market_cap: 0,
+          total_volume: 0,
+          market_cap_rank: null,
+        };
       }
-      
-      // Fallback to placeholder data
-      return {
-        id: 'kwe',
-        name: 'KWE Network',
-        symbol: 'kwe',
-        image: '/kwe-logo.svg',
-        current_price: 0.0025,
-        price_change_percentage_24h: 3.45,
-        market_cap: 1250000,
-        total_volume: 75000,
-        market_cap_rank: null,
-      };
     };
 
     const fetchCryptoData = async () => {
@@ -114,8 +90,42 @@ const CryptoTable: React.FC<CryptoTableProps> = ({ showSearch }) => {
     fetchCryptoData();
   }, []);
 
+  // Update KWE price every 30 seconds
+  useEffect(() => {
+    const updateKWEPrice = async () => {
+      try {
+        const price = await fetchKWEPrice();
+        setKwePrice(price);
+      } catch (error) {
+        // Silently fail, keep the previous price
+      }
+    };
+
+    // Set up interval to update price every 30 seconds
+    const interval = setInterval(updateKWEPrice, 30000);
+
+    // Cleanup interval on unmount
+    return () => clearInterval(interval);
+  }, []);
+
+  // Update cryptos when KWE price changes
+  useEffect(() => {
+    if (kwePrice > 0) {
+      setCryptos(prevCryptos => {
+        if (prevCryptos.length === 0) return prevCryptos;
+        const updated = prevCryptos.map(crypto => {
+          if (crypto.id === 'kwe') {
+            return { ...crypto, current_price: kwePrice };
+          }
+          return crypto;
+        });
+        return updated;
+      });
+    }
+  }, [kwePrice]);
+
   const formatNumber = (num: number): string => {
-    if (num == null) return 'N/A';
+    if (num == null || num === 0) return 'N/A';
     if (num >= 1e12) {
       return `$${(num / 1e12).toFixed(2)}T`;
     }
