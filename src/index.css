@@ -49,20 +49,35 @@ code {
 }
 
 .header {
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 40px 20px 30px;
   background-color: #0d0d0d;
   margin-bottom: 30px;
+  position: relative;
+}
+
+.header .logo {
+  position: absolute;
+  left: 20px;
+  height: 50px;
+  width: auto;
 }
 
 .header h1 {
   margin: 0;
   font-size: 2.5rem;
   font-weight: 700;
-  background: linear-gradient(90deg, #3861fb, #e83e8c);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+}
+
+.coin-text {
+  color: #39ff14;
+  text-shadow: 0 0 10px #39ff14, 0 0 20px #39ff14, 0 0 30px #39ff14;
+}
+
+.tick-text {
+  color: #e32315;
 }
 
 .crypto-table {
