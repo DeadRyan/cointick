@@ -82,62 +82,63 @@ const CryptoTable: React.FC<CryptoTableProps> = ({ showSearch }) => {
         // Fetch KWE data first
         const kweData = await fetchKWEData();
         
-        // Fetch 4 pages of CoinGecko data sequentially with delay to avoid rate limits
-        // This fetches 1000 coins total (4 pages × 250 coins/page)
-        const pages = [1, 2, 3, 4];
-        const allCoins: Cryptocurrency[] = [];
-        let successfulPages = 0;
+        // Fetch first page to get initial 100 coins for faster loading
+        const response1 = await fetch(
+          `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=1&sparkline=false`
+        );
         
-        for (const page of pages) {
+        if (!response1.ok) {
+          throw new Error('Failed to fetch initial coin data');
+        }
+        
+        const data1: Cryptocurrency[] = await response1.json();
+        
+        // Use first 100 coins for initial display
+        const initialData = data1.slice(0, 100);
+        initialData.sort((a, b) => (b.market_cap || 0) - (a.market_cap || 0));
+        
+        // Insert KWE at position 777 (index 776) or at the end if less
+        const initialCryptos = [...initialData];
+        const insertIndex = Math.min(776, initialCryptos.length);
+        initialCryptos.splice(insertIndex, 0, kweData);
+        setCryptos(initialCryptos);
+        
+        // Fetch remaining data in parallel in the background
+        const remainingFromPage1 = data1.slice(100);
+        const otherPages = [2, 3, 4];
+        const otherPromises = otherPages.map(async (page) => {
           try {
             const response = await fetch(
               `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=${page}&sparkline=false`
             );
             
-            if (!response.ok) {
-              // If we get a rate limit error, stop fetching more pages
-              if (response.status === 429) {
-                console.warn(`Rate limit reached at page ${page}, using ${successfulPages} pages`);
-                break;
-              }
-              throw new Error(`Failed to fetch page ${page}`);
+            if (response.ok) {
+              return await response.json();
             }
-            
-            const data: Cryptocurrency[] = await response.json();
-            allCoins.push(...data);
-            successfulPages++;
-            
-            // Add 1 second delay between requests to stay under rate limits
-            // (CoinGecko free tier: 10-30 calls/min)
-            if (page < pages.length) {
-              await new Promise(resolve => setTimeout(resolve, 1000));
-            }
+            return [];
           } catch (err) {
-            // Log error but continue with whatever data we have
             console.error(`Error fetching page ${page}:`, err);
-            // If we have some data, continue; otherwise break
-            if (successfulPages === 0) {
-              throw err;
-            }
-            break;
+            return [];
           }
-        }
-        
-        // Deduplicate by coin ID (in case of duplicates)
-        const uniqueCoins = Array.from(
-          new Map(allCoins.map(coin => [coin.id, coin])).values()
-        );
-        
-        // Sort by market cap
-        uniqueCoins.sort((a, b) => {
-          return (b.market_cap || 0) - (a.market_cap || 0);
         });
         
-        // Insert KWE at position 777 (index 776)
-        const cryptos = [...uniqueCoins];
-        const insertIndex = Math.min(776, cryptos.length);
-        cryptos.splice(insertIndex, 0, kweData);
-        setCryptos(cryptos);
+        const otherData = await Promise.all(otherPromises);
+        const allRemaining = [...remainingFromPage1, ...otherData.flat()];
+        
+        // Deduplicate by coin ID
+        const uniqueRemaining = Array.from(
+          new Map(allRemaining.map(coin => [coin.id, coin])).values()
+        );
+        
+        // Combine with initial data
+        const allCoins = [...initialData, ...uniqueRemaining];
+        allCoins.sort((a, b) => (b.market_cap || 0) - (a.market_cap || 0));
+        
+        // Insert KWE at position 777
+        const finalCryptos = [...allCoins];
+        const finalInsertIndex = Math.min(776, finalCryptos.length);
+        finalCryptos.splice(finalInsertIndex, 0, kweData);
+        setCryptos(finalCryptos);
         setError(null);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An error occurred');
