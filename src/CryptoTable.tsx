@@ -9,7 +9,7 @@ interface Cryptocurrency {
   price_change_percentage_24h: number;
   market_cap: number;
   total_volume: number;
-  market_cap_rank: number;
+  market_cap_rank: number | null;
 }
 
 interface CryptoTableProps {
@@ -46,7 +46,7 @@ const CryptoTable: React.FC<CryptoTableProps> = ({ showSearch }) => {
           price_change_percentage_24h: 3.45,
           market_cap: 1250000,
           total_volume: 75000,
-          market_cap_rank: 0,
+          market_cap_rank: null,
         };
         
         // Add KWE at the top of the list
