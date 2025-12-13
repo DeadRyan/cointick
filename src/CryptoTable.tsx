@@ -12,6 +12,24 @@ interface Cryptocurrency {
   market_cap_rank: number | null;
 }
 
+interface CoinrankingCoin {
+  uuid: string;
+  name: string;
+  symbol: string;
+  iconUrl: string;
+  price: string;
+  change: string;
+  marketCap: string;
+  '24hVolume': string;
+  rank: number;
+}
+
+interface CoinrankingResponse {
+  data: {
+    coins: CoinrankingCoin[];
+  };
+}
+
 interface CryptoTableProps {
   showSearch: boolean;
 }
@@ -29,7 +47,7 @@ const CryptoTable: React.FC<CryptoTableProps> = ({ showSearch }) => {
         const response = await fetch('https://api.coinranking.com/v2/coins?search=kwe&limit=1');
         
         if (response.ok) {
-          const data = await response.json();
+          const data: CoinrankingResponse = await response.json();
           
           // Check if KWE coin was found in the response
           if (data.data?.coins && data.data.coins.length > 0) {
@@ -50,8 +68,7 @@ const CryptoTable: React.FC<CryptoTableProps> = ({ showSearch }) => {
           }
         }
       } catch (error) {
-        // Silently fall back to placeholder data
-        console.log('Using placeholder data for KWE');
+        // Fall back to placeholder data if API request fails
       }
       
       // Fallback to placeholder data
