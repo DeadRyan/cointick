@@ -59,6 +59,21 @@ describe('CryptoTable', () => {
           json: async () => mockKWEPriceResponse,
         });
       }
+      // Mock Coinranking API response
+      if (url.includes('coinranking.com')) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({
+            data: {
+              coin: {
+                marketCap: '1000000',
+                '24hVolume': '50000',
+                change: '5.0'
+              }
+            }
+          }),
+        });
+      }
       // Mock CoinGecko API response - all 4 pages return the same mock data
       if (url.startsWith('https://api.coingecko.com')) {
         return Promise.resolve({

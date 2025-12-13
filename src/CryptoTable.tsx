@@ -33,16 +33,30 @@ const CryptoTable: React.FC<CryptoTableProps> = ({ showSearch }) => {
         // Update the KWE price state for periodic updates
         setKwePrice(price);
         
-        // Return KWE data with the fetched price
+        // Fetch additional data from Coinranking API
+        const coinrankingResponse = await fetch(`https://api.coinranking.com/v2/coin/L_vX2sFWI`);
+        let marketCap = 0;
+        let volume24h = 0;
+        let change24h = 0;
+        
+        if (coinrankingResponse.ok) {
+          const coinrankingData = await coinrankingResponse.json();
+          const coin = coinrankingData.data.coin;
+          marketCap = parseFloat(coin.marketCap) || 0;
+          volume24h = parseFloat(coin['24hVolume']) || 0;
+          change24h = parseFloat(coin.change) || 0;
+        }
+        
+        // Return KWE data with the fetched price and additional data
         return {
           id: 'kwe',
           name: 'KWE Network',
           symbol: 'kwe',
           image: '/kwe-logo.svg',
           current_price: price,
-          price_change_percentage_24h: 0, // N/A - not available from API
-          market_cap: 0, // N/A - not available from API
-          total_volume: 0, // N/A - not available from API
+          price_change_percentage_24h: change24h,
+          market_cap: marketCap,
+          total_volume: volume24h,
           market_cap_rank: null,
         };
       } catch (error) {
