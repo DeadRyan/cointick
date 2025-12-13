@@ -55,7 +55,7 @@ describe('CryptoTable', () => {
   });
 
   test('renders search input with placeholder', async () => {
-    render(<CryptoTable />);
+    render(<CryptoTable showSearch={true} />);
     
     await waitFor(() => {
       expect(screen.queryByText(/Loading/i)).not.toBeInTheDocument();
@@ -65,8 +65,18 @@ describe('CryptoTable', () => {
     expect(searchInput).toBeInTheDocument();
   });
 
+  test('does not render search input when showSearch is false', async () => {
+    render(<CryptoTable showSearch={false} />);
+    
+    await waitFor(() => {
+      expect(screen.queryByText(/Loading/i)).not.toBeInTheDocument();
+    });
+    
+    expect(screen.queryByPlaceholderText(/Search cryptocurrencies.../i)).not.toBeInTheDocument();
+  });
+
   test('filters cryptocurrencies by name', async () => {
-    render(<CryptoTable />);
+    render(<CryptoTable showSearch={true} />);
     
     await waitFor(() => {
       expect(screen.getByText('Bitcoin')).toBeInTheDocument();
@@ -81,7 +91,7 @@ describe('CryptoTable', () => {
   });
 
   test('filters cryptocurrencies by symbol', async () => {
-    render(<CryptoTable />);
+    render(<CryptoTable showSearch={true} />);
     
     await waitFor(() => {
       expect(screen.getByText('Ethereum')).toBeInTheDocument();
@@ -96,7 +106,7 @@ describe('CryptoTable', () => {
   });
 
   test('search is case-insensitive', async () => {
-    render(<CryptoTable />);
+    render(<CryptoTable showSearch={true} />);
     
     await waitFor(() => {
       expect(screen.getByText('Cardano')).toBeInTheDocument();
@@ -111,7 +121,7 @@ describe('CryptoTable', () => {
   });
 
   test('shows all cryptocurrencies when search is empty', async () => {
-    render(<CryptoTable />);
+    render(<CryptoTable showSearch={true} />);
     
     await waitFor(() => {
       expect(screen.getByText('Bitcoin')).toBeInTheDocument();
@@ -123,7 +133,7 @@ describe('CryptoTable', () => {
   });
 
   test('shows no results for non-matching search', async () => {
-    render(<CryptoTable />);
+    render(<CryptoTable showSearch={true} />);
     
     await waitFor(() => {
       expect(screen.getByText('Bitcoin')).toBeInTheDocument();

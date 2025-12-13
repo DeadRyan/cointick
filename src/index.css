@@ -51,24 +51,65 @@ code {
 .header {
   display: flex;
   align-items: center;
-  justify-content: center;
-  padding: 40px 20px 30px;
+  justify-content: space-between;
+  padding: 20px;
   background-color: #0d0d0d;
   margin-bottom: 30px;
   position: relative;
 }
 
-.header .logo {
-  position: absolute;
-  left: 20px;
-  height: 50px;
-  width: auto;
+.header-title {
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: 700;
 }
 
-.header h1 {
-  margin: 0;
-  font-size: 2.5rem;
-  font-weight: 700;
+.hamburger-menu {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 10px;
+  z-index: 1000;
+}
+
+.hamburger-line {
+  width: 25px;
+  height: 3px;
+  background-color: #ffffff;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+.menu-dropdown {
+  position: absolute;
+  top: 60px;
+  right: 20px;
+  background-color: #2a2a2a;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  z-index: 999;
+  overflow: hidden;
+}
+
+.menu-item {
+  display: block;
+  width: 100%;
+  padding: 15px 20px;
+  background: none;
+  border: none;
+  color: #ffffff;
+  text-align: left;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  white-space: nowrap;
+}
+
+.menu-item:hover {
+  background-color: #3a3a3a;
 }
 
 .coin-text {
@@ -161,8 +202,12 @@ code {
 }
 
 @media (max-width: 768px) {
-  .header h1 {
-    font-size: 1.8rem;
+  .header {
+    padding: 15px 20px;
+  }
+
+  .header-title {
+    font-size: 1.5rem;
   }
 
   .crypto-table {
@@ -171,7 +216,12 @@ code {
 
   .crypto-table th,
   .crypto-table td {
-    padding: 10px 8px;
+    padding: 10px 5px;
+  }
+
+  .crypto-table th:first-child,
+  .crypto-table td:first-child {
+    padding-left: 10px;
   }
 
   .crypto-logo {
@@ -179,10 +229,30 @@ code {
     height: 24px;
   }
 
+  .crypto-name {
+    gap: 8px;
+  }
+
+  .crypto-symbol {
+    display: block;
+    margin-left: 0;
+    font-size: 0.75rem;
+  }
+
+  /* Hide market cap and volume columns on mobile */
   .crypto-table th:nth-child(5),
   .crypto-table td:nth-child(5),
   .crypto-table th:nth-child(6),
   .crypto-table td:nth-child(6) {
     display: none;
+  }
+
+  .container {
+    padding: 15px;
+  }
+
+  .search-input {
+    padding: 12px 15px;
+    font-size: 0.9rem;
   }
 }
