@@ -37,7 +37,8 @@ const CryptoTable: React.FC<CryptoTableProps> = ({ showSearch }) => {
         setKwePrice(price);
         
         // Fetch KWE market data from Coinranking API
-        // Note: Using a placeholder for API key. Get a free key from https://developers.coinranking.com/
+        // API key is optional via REACT_APP_COINRANKING_API_KEY environment variable
+        // Get a free key from https://developers.coinranking.com/
         const coinrankingHeaders: HeadersInit = {};
         
         // Add API key if available from environment variable
@@ -66,7 +67,7 @@ const CryptoTable: React.FC<CryptoTableProps> = ({ showSearch }) => {
             }
           }
         } catch (err) {
-          // Silently fail and use default values if Coinranking API fails
+          // Log warning and use default values if Coinranking API fails
           console.warn('Failed to fetch KWE data from Coinranking API:', err);
         }
         
