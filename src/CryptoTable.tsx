@@ -113,6 +113,15 @@ const CryptoTable: React.FC<CryptoTableProps> = ({ showSearch }) => {
     if (kwePrice > 0) {
       setCryptos(prevCryptos => {
         if (prevCryptos.length === 0) return prevCryptos;
+        
+        // Find the current KWE entry
+        const currentKWE = prevCryptos.find(crypto => crypto.id === 'kwe');
+        
+        // Only update if the price has changed
+        if (currentKWE && currentKWE.current_price === kwePrice) {
+          return prevCryptos;
+        }
+        
         const updated = prevCryptos.map(crypto => {
           if (crypto.id === 'kwe') {
             return { ...crypto, current_price: kwePrice };
