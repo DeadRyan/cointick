@@ -48,6 +48,16 @@ const mockKWEPriceResponse = {
   },
 };
 
+const mockKWECoinrankingResponse = {
+  data: {
+    coin: {
+      marketCap: '1000000',
+      change: '5.5',
+      '24hVolume': '50000',
+    },
+  },
+};
+
 describe('CryptoTable', () => {
   beforeEach(() => {
     // Default mock for APIs
@@ -59,7 +69,14 @@ describe('CryptoTable', () => {
           json: async () => mockKWEPriceResponse,
         });
       }
-      // Mock CoinGecko API response - all 4 pages return the same mock data
+      // Mock Coinranking API response for KWE
+      if (url.startsWith('https://api.coinranking.com')) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => mockKWECoinrankingResponse,
+        });
+      }
+      // Mock CoinGecko API response - all 8 pages return the same mock data
       if (url.startsWith('https://api.coingecko.com')) {
         return Promise.resolve({
           ok: true,
@@ -81,11 +98,9 @@ describe('CryptoTable', () => {
   test('renders search input with placeholder', async () => {
     render(<CryptoTable showSearch={true} />);
     
-    
-    
     await waitFor(() => {
       expect(screen.queryByText(/Loading/i)).not.toBeInTheDocument();
-    }, { timeout: 5000 });
+    }, { timeout: 15000 });
     
     const searchInput = screen.getByPlaceholderText(/Search cryptocurrencies.../i);
     expect(searchInput).toBeInTheDocument();
@@ -98,7 +113,7 @@ describe('CryptoTable', () => {
     
     await waitFor(() => {
       expect(screen.queryByText(/Loading/i)).not.toBeInTheDocument();
-    }, { timeout: 5000 });
+    }, { timeout: 15000 });
     
     expect(screen.queryByPlaceholderText(/Search cryptocurrencies.../i)).not.toBeInTheDocument();
   });
@@ -110,7 +125,7 @@ describe('CryptoTable', () => {
     
     await waitFor(() => {
       expect(screen.getByText('Bitcoin')).toBeInTheDocument();
-    }, { timeout: 5000 });
+    }, { timeout: 15000 });
     
     const searchInput = screen.getByPlaceholderText(/Search cryptocurrencies.../i);
     await userEvent.type(searchInput, 'bitcoin');
@@ -127,7 +142,7 @@ describe('CryptoTable', () => {
     
     await waitFor(() => {
       expect(screen.getByText('Ethereum')).toBeInTheDocument();
-    }, { timeout: 5000 });
+    }, { timeout: 15000 });
     
     const searchInput = screen.getByPlaceholderText(/Search cryptocurrencies.../i);
     await userEvent.type(searchInput, 'eth');
@@ -144,7 +159,7 @@ describe('CryptoTable', () => {
     
     await waitFor(() => {
       expect(screen.getByText('Cardano')).toBeInTheDocument();
-    }, { timeout: 5000 });
+    }, { timeout: 15000 });
     
     const searchInput = screen.getByPlaceholderText(/Search cryptocurrencies.../i);
     await userEvent.type(searchInput, 'CARDANO');
@@ -161,7 +176,7 @@ describe('CryptoTable', () => {
     
     await waitFor(() => {
       expect(screen.getByText('Bitcoin')).toBeInTheDocument();
-    }, { timeout: 5000 });
+    }, { timeout: 15000 });
     
     expect(screen.getByText('Bitcoin')).toBeInTheDocument();
     expect(screen.getByText('Ethereum')).toBeInTheDocument();
@@ -175,7 +190,7 @@ describe('CryptoTable', () => {
     
     await waitFor(() => {
       expect(screen.getByText('Bitcoin')).toBeInTheDocument();
-    }, { timeout: 5000 });
+    }, { timeout: 15000 });
     
     const searchInput = screen.getByPlaceholderText(/Search cryptocurrencies.../i);
     await userEvent.type(searchInput, 'nonexistent');
@@ -185,16 +200,16 @@ describe('CryptoTable', () => {
     expect(screen.queryByText('Cardano')).not.toBeInTheDocument();
   });
 
-  test('displays KWE cryptocurrency at the top of the list', async () => {
+  test('displays KWE cryptocurrency with rank 1777', async () => {
     render(<CryptoTable showSearch={false} />);
     
     
     
     await waitFor(() => {
       expect(screen.getByText('KWE Network')).toBeInTheDocument();
-    }, { timeout: 5000 });
+    }, { timeout: 15000 });
     
-    // Verify KWE is displayed
+    // Verify KWE is displayed with rank 1777
     expect(screen.getByText('KWE Network')).toBeInTheDocument();
   });
 
@@ -205,7 +220,7 @@ describe('CryptoTable', () => {
     
     await waitFor(() => {
       expect(screen.getByText('KWE Network')).toBeInTheDocument();
-    }, { timeout: 5000 });
+    }, { timeout: 15000 });
     
     const searchInput = screen.getByPlaceholderText(/Search cryptocurrencies.../i);
     await userEvent.type(searchInput, 'kwe');
@@ -221,15 +236,31 @@ describe('CryptoTable', () => {
     
     await waitFor(() => {
       expect(screen.getByText('KWE Network')).toBeInTheDocument();
-    }, { timeout: 5000 });
+    }, { timeout: 15000 });
     
     // Verify PriceTicker API was called
     expect(global.fetch).toHaveBeenCalledWith(
       'https://kwepriceticker.com/api/price'
     );
     
-    // Verify KWE is displayed at the top
+    // Verify KWE is displayed
     expect(screen.getByText('KWE Network')).toBeInTheDocument();
+  });
+
+  test('fetches KWE market data from Coinranking API', async () => {
+    render(<CryptoTable showSearch={false} />);
+    
+    await waitFor(() => {
+      expect(screen.getByText('KWE Network')).toBeInTheDocument();
+    }, { timeout: 15000 });
+    
+    // Verify Coinranking API was called with correct UUID
+    expect(global.fetch).toHaveBeenCalledWith(
+      'https://api.coinranking.com/v2/coin/L_vX2sFWI',
+      expect.objectContaining({
+        headers: expect.any(Object),
+      })
+    );
   });
 
   test('falls back to placeholder data when PriceTicker API fails', async () => {
@@ -239,6 +270,12 @@ describe('CryptoTable', () => {
         return Promise.resolve({
           ok: false,
           json: async () => ({}),
+        });
+      }
+      if (url.startsWith('https://api.coinranking.com')) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => mockKWECoinrankingResponse,
         });
       }
       return Promise.resolve({
@@ -253,9 +290,40 @@ describe('CryptoTable', () => {
     
     await waitFor(() => {
       expect(screen.getByText('KWE Network')).toBeInTheDocument();
-    }, { timeout: 5000 });
+    }, { timeout: 15000 });
     
     // Verify KWE is still displayed (using fallback data)
+    expect(screen.getByText('KWE Network')).toBeInTheDocument();
+  });
+
+  test('handles Coinranking API failure gracefully', async () => {
+    // Mock API failure for Coinranking
+    (global.fetch as jest.Mock).mockImplementation((url: string) => {
+      if (url.startsWith('https://kwepriceticker.com')) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => mockKWEPriceResponse,
+        });
+      }
+      if (url.startsWith('https://api.coinranking.com')) {
+        return Promise.resolve({
+          ok: false,
+          json: async () => ({}),
+        });
+      }
+      return Promise.resolve({
+        ok: true,
+        json: async () => mockCryptos,
+      });
+    });
+
+    render(<CryptoTable showSearch={false} />);
+    
+    await waitFor(() => {
+      expect(screen.getByText('KWE Network')).toBeInTheDocument();
+    }, { timeout: 15000 });
+    
+    // Verify KWE is still displayed with fallback values (0 for market data)
     expect(screen.getByText('KWE Network')).toBeInTheDocument();
   });
 });

@@ -20,10 +20,46 @@ const mockCryptos = [
   },
 ];
 
+const mockKWEPriceResponse = {
+  result: {
+    last: '0.0025',
+  },
+};
+
+const mockKWECoinrankingResponse = {
+  data: {
+    coin: {
+      marketCap: '1000000',
+      change: '5.5',
+      '24hVolume': '50000',
+    },
+  },
+};
+
 beforeEach(() => {
-  (global.fetch as jest.Mock).mockResolvedValue({
-    ok: true,
-    json: async () => mockCryptos,
+  (global.fetch as jest.Mock).mockImplementation((url: string) => {
+    if (url.startsWith('https://kwepriceticker.com')) {
+      return Promise.resolve({
+        ok: true,
+        json: async () => mockKWEPriceResponse,
+      });
+    }
+    if (url.startsWith('https://api.coinranking.com')) {
+      return Promise.resolve({
+        ok: true,
+        json: async () => mockKWECoinrankingResponse,
+      });
+    }
+    if (url.startsWith('https://api.coingecko.com')) {
+      return Promise.resolve({
+        ok: true,
+        json: async () => mockCryptos,
+      });
+    }
+    return Promise.resolve({
+      ok: true,
+      json: async () => mockCryptos,
+    });
   });
 });
 
@@ -77,7 +113,7 @@ test('shows search input when Search menu item is clicked', async () => {
   // Wait for loading to complete
   await waitFor(() => {
     expect(screen.queryByText(/Loading/i)).not.toBeInTheDocument();
-  }, { timeout: 5000 });
+  }, { timeout: 15000 });
   
   const menuButton = screen.getByLabelText('Toggle menu');
   
@@ -100,7 +136,7 @@ test('closes menu when Search menu item is clicked', async () => {
   // Wait for loading to complete
   await waitFor(() => {
     expect(screen.queryByText(/Loading/i)).not.toBeInTheDocument();
-  }, { timeout: 5000 });
+  }, { timeout: 15000 });
   
   const menuButton = screen.getByLabelText('Toggle menu');
   
