@@ -81,7 +81,6 @@ describe('CryptoTable', () => {
   test('renders search input with placeholder', async () => {
     render(<CryptoTable showSearch={true} />);
     
-    // Fast-forward through the sequential delays
     
     
     await waitFor(() => {
@@ -95,7 +94,6 @@ describe('CryptoTable', () => {
   test('does not render search input when showSearch is false', async () => {
     render(<CryptoTable showSearch={false} />);
     
-    // Fast-forward through the sequential delays
     
     
     await waitFor(() => {
@@ -108,7 +106,6 @@ describe('CryptoTable', () => {
   test('filters cryptocurrencies by name', async () => {
     render(<CryptoTable showSearch={true} />);
     
-    // Fast-forward through the sequential delays
     
     
     await waitFor(() => {
@@ -126,7 +123,6 @@ describe('CryptoTable', () => {
   test('filters cryptocurrencies by symbol', async () => {
     render(<CryptoTable showSearch={true} />);
     
-    // Fast-forward through the sequential delays
     
     
     await waitFor(() => {
@@ -144,7 +140,6 @@ describe('CryptoTable', () => {
   test('search is case-insensitive', async () => {
     render(<CryptoTable showSearch={true} />);
     
-    // Fast-forward through the sequential delays
     
     
     await waitFor(() => {
@@ -162,7 +157,6 @@ describe('CryptoTable', () => {
   test('shows all cryptocurrencies when search is empty', async () => {
     render(<CryptoTable showSearch={true} />);
     
-    // Fast-forward through the sequential delays
     
     
     await waitFor(() => {
@@ -177,7 +171,6 @@ describe('CryptoTable', () => {
   test('shows no results for non-matching search', async () => {
     render(<CryptoTable showSearch={true} />);
     
-    // Fast-forward through the sequential delays
     
     
     await waitFor(() => {
@@ -195,7 +188,6 @@ describe('CryptoTable', () => {
   test('displays KWE cryptocurrency at the top of the list', async () => {
     render(<CryptoTable showSearch={false} />);
     
-    // Fast-forward through the sequential delays
     
     
     await waitFor(() => {
@@ -209,7 +201,6 @@ describe('CryptoTable', () => {
   test('KWE can be filtered by search', async () => {
     render(<CryptoTable showSearch={true} />);
     
-    // Fast-forward through the sequential delays
     
     
     await waitFor(() => {
@@ -226,7 +217,6 @@ describe('CryptoTable', () => {
   test('fetches KWE data from PriceTicker API when available', async () => {
     render(<CryptoTable showSearch={false} />);
     
-    // Fast-forward through the sequential delays
     
     
     await waitFor(() => {
@@ -259,7 +249,6 @@ describe('CryptoTable', () => {
 
     render(<CryptoTable showSearch={false} />);
     
-    // Fast-forward through the sequential delays
     
     
     await waitFor(() => {

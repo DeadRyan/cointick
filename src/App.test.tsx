@@ -72,7 +72,6 @@ test('opens menu when hamburger button is clicked', async () => {
 test('shows search input when Search menu item is clicked', async () => {
   render(<App />);
   
-  // Fast-forward through the sequential delays
   
   
   // Wait for loading to complete
@@ -96,7 +95,6 @@ test('shows search input when Search menu item is clicked', async () => {
 test('closes menu when Search menu item is clicked', async () => {
   render(<App />);
   
-  // Fast-forward through the sequential delays
   
   
   // Wait for loading to complete
