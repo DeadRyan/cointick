@@ -119,8 +119,11 @@ const CryptoTable: React.FC<CryptoTableProps> = ({ showSearch }) => {
           return (b.market_cap || 0) - (a.market_cap || 0);
         });
         
-        // Add KWE at the top of the list
-        setCryptos([kweData, ...uniqueCoins]);
+        // Insert KWE at position 777 (index 776)
+        const cryptos = [...uniqueCoins];
+        const insertIndex = Math.min(776, cryptos.length);
+        cryptos.splice(insertIndex, 0, kweData);
+        setCryptos(cryptos);
         setError(null);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An error occurred');
