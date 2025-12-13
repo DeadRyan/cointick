@@ -237,8 +237,8 @@ const CryptoTable: React.FC<CryptoTableProps> = ({ showSearch }) => {
     return cryptos.filter((crypto) => {
       const searchLower = searchQuery.toLowerCase();
       return (
-        crypto.name.toLowerCase().includes(searchLower) ||
-        crypto.symbol.toLowerCase().includes(searchLower)
+        crypto.name.toLowerCase().startsWith(searchLower) ||
+        crypto.symbol.toLowerCase().startsWith(searchLower)
       );
     });
   }, [cryptos, searchQuery]);
