@@ -101,6 +101,12 @@ const CryptoTable: React.FC<CryptoTableProps> = ({ showSearch }) => {
         const initialCryptos = [...initialData];
         const insertIndex = Math.min(776, initialCryptos.length);
         initialCryptos.splice(insertIndex, 0, kweData);
+        
+        // Assign initial ranks
+        initialCryptos.forEach((crypto, index) => {
+          crypto.market_cap_rank = index + 1;
+        });
+        
         setCryptos(initialCryptos);
         
         // Fetch remaining data in parallel in the background
@@ -138,6 +144,12 @@ const CryptoTable: React.FC<CryptoTableProps> = ({ showSearch }) => {
         const finalCryptos = [...allCoins];
         const finalInsertIndex = Math.min(776, finalCryptos.length);
         finalCryptos.splice(finalInsertIndex, 0, kweData);
+        
+        // Assign ranks based on position: 1, 2, 3, ..., 777 for KWE, 778, etc.
+        finalCryptos.forEach((crypto, index) => {
+          crypto.market_cap_rank = index + 1;
+        });
+        
         setCryptos(finalCryptos);
         setError(null);
       } catch (err) {
