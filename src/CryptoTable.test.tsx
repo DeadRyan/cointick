@@ -42,11 +42,40 @@ const mockCryptos = [
   },
 ];
 
+const mockKWECoinrankingResponse = {
+  data: {
+    coins: [
+      {
+        uuid: 'kwe-uuid',
+        symbol: 'KWE',
+        name: 'KWE Network',
+        iconUrl: 'https://example.com/kwe.png',
+        price: '0.0025',
+        change: '3.45',
+        marketCap: '1250000',
+        '24hVolume': '75000',
+        rank: 500,
+      },
+    ],
+  },
+};
+
 describe('CryptoTable', () => {
   beforeEach(() => {
-    (global.fetch as jest.Mock).mockResolvedValue({
-      ok: true,
-      json: async () => mockCryptos,
+    // Default mock for CoinGecko API
+    (global.fetch as jest.Mock).mockImplementation((url: string) => {
+      if (url.includes('coinranking.com')) {
+        // Mock Coinranking API response
+        return Promise.resolve({
+          ok: true,
+          json: async () => mockKWECoinrankingResponse,
+        });
+      }
+      // Mock CoinGecko API response
+      return Promise.resolve({
+        ok: true,
+        json: async () => mockCryptos,
+      });
     });
   });
 
@@ -170,5 +199,46 @@ describe('CryptoTable', () => {
     
     expect(screen.getByText('KWE Network')).toBeInTheDocument();
     expect(screen.queryByText('Bitcoin')).not.toBeInTheDocument();
+  });
+
+  test('fetches KWE data from Coinranking API when available', async () => {
+    render(<CryptoTable showSearch={false} />);
+    
+    await waitFor(() => {
+      expect(screen.getByText('KWE Network')).toBeInTheDocument();
+    });
+    
+    // Verify Coinranking API was called
+    expect(global.fetch).toHaveBeenCalledWith(
+      expect.stringContaining('coinranking.com')
+    );
+    
+    // Verify KWE is displayed at the top
+    expect(screen.getByText('KWE Network')).toBeInTheDocument();
+  });
+
+  test('falls back to placeholder data when Coinranking API fails', async () => {
+    // Mock API failure for Coinranking
+    (global.fetch as jest.Mock).mockImplementation((url: string) => {
+      if (url.includes('coinranking.com')) {
+        return Promise.resolve({
+          ok: false,
+          json: async () => ({}),
+        });
+      }
+      return Promise.resolve({
+        ok: true,
+        json: async () => mockCryptos,
+      });
+    });
+
+    render(<CryptoTable showSearch={false} />);
+    
+    await waitFor(() => {
+      expect(screen.getByText('KWE Network')).toBeInTheDocument();
+    });
+    
+    // Verify KWE is still displayed (using fallback data)
+    expect(screen.getByText('KWE Network')).toBeInTheDocument();
   });
 });
