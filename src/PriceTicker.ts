@@ -13,10 +13,15 @@ export const fetchKWEPrice = async (): Promise<number> => {
   
   const data: KWEPriceResponse = await response.json();
   
-  // Parse the value to ensure it's a number (API returns string)
-  const parsedPrice = parseFloat(data.result.last as any);
+  // Return 0 if value is null/undefined
+  if (data.result.last == null) {
+    return 0;
+  }
   
-  // Return 0 if parsing fails (NaN) or if value is null/undefined
+  // Parse the value to ensure it's a number (API returns string)
+  const parsedPrice = parseFloat(String(data.result.last));
+  
+  // Return 0 if parsing fails (NaN)
   if (isNaN(parsedPrice)) {
     return 0;
   }
