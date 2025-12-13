@@ -72,10 +72,12 @@ test('opens menu when hamburger button is clicked', async () => {
 test('shows search input when Search menu item is clicked', async () => {
   render(<App />);
   
+  
+  
   // Wait for loading to complete
   await waitFor(() => {
     expect(screen.queryByText(/Loading/i)).not.toBeInTheDocument();
-  });
+  }, { timeout: 5000 });
   
   const menuButton = screen.getByLabelText('Toggle menu');
   
@@ -93,10 +95,12 @@ test('shows search input when Search menu item is clicked', async () => {
 test('closes menu when Search menu item is clicked', async () => {
   render(<App />);
   
+  
+  
   // Wait for loading to complete
   await waitFor(() => {
     expect(screen.queryByText(/Loading/i)).not.toBeInTheDocument();
-  });
+  }, { timeout: 5000 });
   
   const menuButton = screen.getByLabelText('Toggle menu');
   

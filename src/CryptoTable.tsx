@@ -65,33 +65,51 @@ const CryptoTable: React.FC<CryptoTableProps> = ({ showSearch }) => {
       try {
         setLoading(true);
         
-        // Fetch KWE data and all 8 pages of CoinGecko data in parallel
-        const pages = [1, 2, 3, 4, 5, 6, 7, 8];
-        const fetchPromises = pages.map(page =>
-          fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=${page}&sparkline=false`)
-        );
+        // Fetch KWE data first
+        const kweData = await fetchKWEData();
         
-        const [kweData, ...coingeckoResponses] = await Promise.all([
-          fetchKWEData(),
-          ...fetchPromises
-        ]);
+        // Fetch 4 pages of CoinGecko data sequentially with delay to avoid rate limits
+        // This fetches 1000 coins total (4 pages × 250 coins/page)
+        const pages = [1, 2, 3, 4];
+        const allCoins: Cryptocurrency[] = [];
+        let successfulPages = 0;
         
-        // Check if any response failed
-        for (const response of coingeckoResponses) {
-          if (!response.ok) {
-            throw new Error('Failed to fetch cryptocurrency data');
+        for (const page of pages) {
+          try {
+            const response = await fetch(
+              `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=${page}&sparkline=false`
+            );
+            
+            if (!response.ok) {
+              // If we get a rate limit error, stop fetching more pages
+              if (response.status === 429) {
+                console.warn(`Rate limit reached at page ${page}, using ${successfulPages} pages`);
+                break;
+              }
+              throw new Error(`Failed to fetch page ${page}`);
+            }
+            
+            const data: Cryptocurrency[] = await response.json();
+            allCoins.push(...data);
+            successfulPages++;
+            
+            // Add 1 second delay between requests to stay under rate limits
+            // (CoinGecko free tier: 10-30 calls/min)
+            if (page < pages.length) {
+              await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+          } catch (err) {
+            // Log error but continue with whatever data we have
+            console.error(`Error fetching page ${page}:`, err);
+            // If we have some data, continue; otherwise break
+            if (successfulPages === 0) {
+              throw err;
+            }
+            break;
           }
         }
         
-        // Parse all responses
-        const dataArrays = await Promise.all(
-          coingeckoResponses.map(response => response.json())
-        );
-        
-        // Flatten and sort by market cap
-        const allCoins = dataArrays.flat();
-        
-        // Deduplicate by coin ID (in case of overlapping pages or duplicates)
+        // Deduplicate by coin ID (in case of duplicates)
         const uniqueCoins = Array.from(
           new Map(allCoins.map(coin => [coin.id, coin])).values()
         );

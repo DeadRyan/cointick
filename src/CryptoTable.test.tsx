@@ -59,7 +59,7 @@ describe('CryptoTable', () => {
           json: async () => mockKWEPriceResponse,
         });
       }
-      // Mock CoinGecko API response - all 8 pages return the same mock data
+      // Mock CoinGecko API response - all 4 pages return the same mock data
       if (url.startsWith('https://api.coingecko.com')) {
         return Promise.resolve({
           ok: true,
@@ -81,9 +81,11 @@ describe('CryptoTable', () => {
   test('renders search input with placeholder', async () => {
     render(<CryptoTable showSearch={true} />);
     
+    
+    
     await waitFor(() => {
       expect(screen.queryByText(/Loading/i)).not.toBeInTheDocument();
-    });
+    }, { timeout: 5000 });
     
     const searchInput = screen.getByPlaceholderText(/Search cryptocurrencies.../i);
     expect(searchInput).toBeInTheDocument();
@@ -92,9 +94,11 @@ describe('CryptoTable', () => {
   test('does not render search input when showSearch is false', async () => {
     render(<CryptoTable showSearch={false} />);
     
+    
+    
     await waitFor(() => {
       expect(screen.queryByText(/Loading/i)).not.toBeInTheDocument();
-    });
+    }, { timeout: 5000 });
     
     expect(screen.queryByPlaceholderText(/Search cryptocurrencies.../i)).not.toBeInTheDocument();
   });
@@ -102,9 +106,11 @@ describe('CryptoTable', () => {
   test('filters cryptocurrencies by name', async () => {
     render(<CryptoTable showSearch={true} />);
     
+    
+    
     await waitFor(() => {
       expect(screen.getByText('Bitcoin')).toBeInTheDocument();
-    });
+    }, { timeout: 5000 });
     
     const searchInput = screen.getByPlaceholderText(/Search cryptocurrencies.../i);
     await userEvent.type(searchInput, 'bitcoin');
@@ -117,9 +123,11 @@ describe('CryptoTable', () => {
   test('filters cryptocurrencies by symbol', async () => {
     render(<CryptoTable showSearch={true} />);
     
+    
+    
     await waitFor(() => {
       expect(screen.getByText('Ethereum')).toBeInTheDocument();
-    });
+    }, { timeout: 5000 });
     
     const searchInput = screen.getByPlaceholderText(/Search cryptocurrencies.../i);
     await userEvent.type(searchInput, 'eth');
@@ -132,9 +140,11 @@ describe('CryptoTable', () => {
   test('search is case-insensitive', async () => {
     render(<CryptoTable showSearch={true} />);
     
+    
+    
     await waitFor(() => {
       expect(screen.getByText('Cardano')).toBeInTheDocument();
-    });
+    }, { timeout: 5000 });
     
     const searchInput = screen.getByPlaceholderText(/Search cryptocurrencies.../i);
     await userEvent.type(searchInput, 'CARDANO');
@@ -147,9 +157,11 @@ describe('CryptoTable', () => {
   test('shows all cryptocurrencies when search is empty', async () => {
     render(<CryptoTable showSearch={true} />);
     
+    
+    
     await waitFor(() => {
       expect(screen.getByText('Bitcoin')).toBeInTheDocument();
-    });
+    }, { timeout: 5000 });
     
     expect(screen.getByText('Bitcoin')).toBeInTheDocument();
     expect(screen.getByText('Ethereum')).toBeInTheDocument();
@@ -159,9 +171,11 @@ describe('CryptoTable', () => {
   test('shows no results for non-matching search', async () => {
     render(<CryptoTable showSearch={true} />);
     
+    
+    
     await waitFor(() => {
       expect(screen.getByText('Bitcoin')).toBeInTheDocument();
-    });
+    }, { timeout: 5000 });
     
     const searchInput = screen.getByPlaceholderText(/Search cryptocurrencies.../i);
     await userEvent.type(searchInput, 'nonexistent');
@@ -174,9 +188,11 @@ describe('CryptoTable', () => {
   test('displays KWE cryptocurrency at the top of the list', async () => {
     render(<CryptoTable showSearch={false} />);
     
+    
+    
     await waitFor(() => {
       expect(screen.getByText('KWE Network')).toBeInTheDocument();
-    });
+    }, { timeout: 5000 });
     
     // Verify KWE is displayed
     expect(screen.getByText('KWE Network')).toBeInTheDocument();
@@ -185,9 +201,11 @@ describe('CryptoTable', () => {
   test('KWE can be filtered by search', async () => {
     render(<CryptoTable showSearch={true} />);
     
+    
+    
     await waitFor(() => {
       expect(screen.getByText('KWE Network')).toBeInTheDocument();
-    });
+    }, { timeout: 5000 });
     
     const searchInput = screen.getByPlaceholderText(/Search cryptocurrencies.../i);
     await userEvent.type(searchInput, 'kwe');
@@ -199,9 +217,11 @@ describe('CryptoTable', () => {
   test('fetches KWE data from PriceTicker API when available', async () => {
     render(<CryptoTable showSearch={false} />);
     
+    
+    
     await waitFor(() => {
       expect(screen.getByText('KWE Network')).toBeInTheDocument();
-    });
+    }, { timeout: 5000 });
     
     // Verify PriceTicker API was called
     expect(global.fetch).toHaveBeenCalledWith(
@@ -229,9 +249,11 @@ describe('CryptoTable', () => {
 
     render(<CryptoTable showSearch={false} />);
     
+    
+    
     await waitFor(() => {
       expect(screen.getByText('KWE Network')).toBeInTheDocument();
-    });
+    }, { timeout: 5000 });
     
     // Verify KWE is still displayed (using fallback data)
     expect(screen.getByText('KWE Network')).toBeInTheDocument();
