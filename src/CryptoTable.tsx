@@ -33,17 +33,53 @@ const CryptoTable: React.FC<CryptoTableProps> = ({ showSearch }) => {
         // Update the KWE price state for periodic updates
         setKwePrice(price);
         
-        // Return KWE data with the fetched price
+        // Fetch KWE market data from Coinranking API
+        // Note: Using a placeholder for API key. Get a free key from https://developers.coinranking.com/
+        const coinrankingHeaders: HeadersInit = {
+          'Content-Type': 'application/json',
+        };
+        
+        // Add API key if available from environment variable
+        const apiKey = process.env.REACT_APP_COINRANKING_API_KEY;
+        if (apiKey) {
+          coinrankingHeaders['x-access-token'] = apiKey;
+        }
+        
+        let marketCap = 0;
+        let priceChange24h = 0;
+        let volume24h = 0;
+        
+        try {
+          const coinrankingResponse = await fetch(
+            'https://api.coinranking.com/v2/coin/L_vX2sFWI',
+            { headers: coinrankingHeaders }
+          );
+          
+          if (coinrankingResponse.ok) {
+            const coinrankingData = await coinrankingResponse.json();
+            if (coinrankingData?.data?.coin) {
+              const coin = coinrankingData.data.coin;
+              marketCap = parseFloat(coin.marketCap) || 0;
+              priceChange24h = parseFloat(coin.change) || 0;
+              volume24h = parseFloat(coin['24hVolume']) || 0;
+            }
+          }
+        } catch (err) {
+          // Silently fail and use default values if Coinranking API fails
+          console.warn('Failed to fetch KWE data from Coinranking API:', err);
+        }
+        
+        // Return KWE data with the fetched price and market data
         return {
           id: 'kwe',
           name: 'KWE Network',
           symbol: 'kwe',
           image: '/kwe-logo.svg',
           current_price: price,
-          price_change_percentage_24h: 0, // N/A - not available from API
-          market_cap: 0, // N/A - not available from API
-          total_volume: 0, // N/A - not available from API
-          market_cap_rank: null,
+          price_change_percentage_24h: priceChange24h,
+          market_cap: marketCap,
+          total_volume: volume24h,
+          market_cap_rank: 1777,
         };
       } catch (error) {
         // Fall back to placeholder data if API request fails
@@ -56,7 +92,7 @@ const CryptoTable: React.FC<CryptoTableProps> = ({ showSearch }) => {
           price_change_percentage_24h: 0,
           market_cap: 0,
           total_volume: 0,
-          market_cap_rank: null,
+          market_cap_rank: 1777,
         };
       }
     };
@@ -68,9 +104,9 @@ const CryptoTable: React.FC<CryptoTableProps> = ({ showSearch }) => {
         // Fetch KWE data first
         const kweData = await fetchKWEData();
         
-        // Fetch 4 pages of CoinGecko data sequentially with delay to avoid rate limits
-        // This fetches 1000 coins total (4 pages × 250 coins/page)
-        const pages = [1, 2, 3, 4];
+        // Fetch 8 pages of CoinGecko data sequentially with delay to avoid rate limits
+        // This fetches 2000 coins total (8 pages × 250 coins/page)
+        const pages = [1, 2, 3, 4, 5, 6, 7, 8];
         const allCoins: Cryptocurrency[] = [];
         let successfulPages = 0;
         
@@ -114,13 +150,28 @@ const CryptoTable: React.FC<CryptoTableProps> = ({ showSearch }) => {
           new Map(allCoins.map(coin => [coin.id, coin])).values()
         );
         
-        // Sort by market cap
+        // Sort by market_cap_rank ascending (lower rank number = higher position)
         uniqueCoins.sort((a, b) => {
-          return (b.market_cap || 0) - (a.market_cap || 0);
+          const rankA = a.market_cap_rank ?? Infinity;
+          const rankB = b.market_cap_rank ?? Infinity;
+          return rankA - rankB;
         });
         
-        // Add KWE at the top of the list
-        setCryptos([kweData, ...uniqueCoins]);
+        // Insert KWE at the correct position (index 1776 for rank 1777)
+        // Find the index where KWE should be inserted based on its rank
+        const insertIndex = uniqueCoins.findIndex(coin => 
+          (coin.market_cap_rank ?? Infinity) > 1777
+        );
+        
+        // If insertIndex is -1, KWE goes at the end; otherwise insert at that index
+        const finalCoins = [...uniqueCoins];
+        if (insertIndex === -1) {
+          finalCoins.push(kweData);
+        } else {
+          finalCoins.splice(insertIndex, 0, kweData);
+        }
+        
+        setCryptos(finalCoins);
         setError(null);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An error occurred');
