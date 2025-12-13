@@ -64,7 +64,7 @@ describe('CryptoTable', () => {
   beforeEach(() => {
     // Default mock for CoinGecko API
     (global.fetch as jest.Mock).mockImplementation((url: string) => {
-      if (url.includes('coinranking.com')) {
+      if (url.startsWith('https://api.coinranking.com')) {
         // Mock Coinranking API response
         return Promise.resolve({
           ok: true,
@@ -210,7 +210,7 @@ describe('CryptoTable', () => {
     
     // Verify Coinranking API was called
     expect(global.fetch).toHaveBeenCalledWith(
-      expect.stringContaining('coinranking.com')
+      'https://api.coinranking.com/v2/coins?search=kwe&limit=1'
     );
     
     // Verify KWE is displayed at the top
@@ -220,7 +220,7 @@ describe('CryptoTable', () => {
   test('falls back to placeholder data when Coinranking API fails', async () => {
     // Mock API failure for Coinranking
     (global.fetch as jest.Mock).mockImplementation((url: string) => {
-      if (url.includes('coinranking.com')) {
+      if (url.startsWith('https://api.coinranking.com')) {
         return Promise.resolve({
           ok: false,
           json: async () => ({}),
