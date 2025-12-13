@@ -60,7 +60,7 @@ describe('CryptoTable', () => {
         });
       }
       // Mock CoinGecko API response - all 8 pages return the same mock data
-      if (url.includes('coingecko.com')) {
+      if (url.startsWith('https://api.coingecko.com')) {
         return Promise.resolve({
           ok: true,
           json: async () => mockCryptos,
