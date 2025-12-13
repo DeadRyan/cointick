@@ -17,6 +17,9 @@ interface CryptoTableProps {
   showSearch: boolean;
 }
 
+// KWE configuration constants
+const KWE_TARGET_RANK = 1777;
+
 const CryptoTable: React.FC<CryptoTableProps> = ({ showSearch }) => {
   const [cryptos, setCryptos] = useState<Cryptocurrency[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -35,9 +38,7 @@ const CryptoTable: React.FC<CryptoTableProps> = ({ showSearch }) => {
         
         // Fetch KWE market data from Coinranking API
         // Note: Using a placeholder for API key. Get a free key from https://developers.coinranking.com/
-        const coinrankingHeaders: HeadersInit = {
-          'Content-Type': 'application/json',
-        };
+        const coinrankingHeaders: HeadersInit = {};
         
         // Add API key if available from environment variable
         const apiKey = process.env.REACT_APP_COINRANKING_API_KEY;
@@ -79,7 +80,7 @@ const CryptoTable: React.FC<CryptoTableProps> = ({ showSearch }) => {
           price_change_percentage_24h: priceChange24h,
           market_cap: marketCap,
           total_volume: volume24h,
-          market_cap_rank: 1777,
+          market_cap_rank: KWE_TARGET_RANK,
         };
       } catch (error) {
         // Fall back to placeholder data if API request fails
@@ -92,7 +93,7 @@ const CryptoTable: React.FC<CryptoTableProps> = ({ showSearch }) => {
           price_change_percentage_24h: 0,
           market_cap: 0,
           total_volume: 0,
-          market_cap_rank: 1777,
+          market_cap_rank: KWE_TARGET_RANK,
         };
       }
     };
@@ -160,7 +161,7 @@ const CryptoTable: React.FC<CryptoTableProps> = ({ showSearch }) => {
         // Insert KWE at the correct position (index 1776 for rank 1777)
         // Find the index where KWE should be inserted based on its rank
         const insertIndex = uniqueCoins.findIndex(coin => 
-          (coin.market_cap_rank ?? Infinity) > 1777
+          (coin.market_cap_rank ?? Infinity) > KWE_TARGET_RANK
         );
         
         // If insertIndex is -1, KWE goes at the end; otherwise insert at that index
