@@ -4,6 +4,7 @@ import CryptoTable from './CryptoTable';
 function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -14,10 +15,16 @@ function App() {
     setIsMenuOpen(false);
   };
 
+  const handleLogoClick = () => {
+    setSearchQuery('');
+    setShowSearch(false);
+    setIsMenuOpen(false);
+  };
+
   return (
     <div className="App">
       <header className="header">
-        <h1 className="header-title">
+        <h1 className="header-title" onClick={handleLogoClick} style={{ cursor: 'pointer' }}>
           <span className="coin-text">Coin</span>
           <span className="tick-text">Tick</span>
         </h1>
@@ -41,7 +48,7 @@ function App() {
           </nav>
         )}
       </header>
-      <CryptoTable showSearch={showSearch} />
+      <CryptoTable showSearch={showSearch} searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
     </div>
   );
 }

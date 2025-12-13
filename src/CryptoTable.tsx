@@ -15,13 +15,14 @@ interface Cryptocurrency {
 
 interface CryptoTableProps {
   showSearch: boolean;
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
 }
 
-const CryptoTable: React.FC<CryptoTableProps> = ({ showSearch }) => {
+const CryptoTable: React.FC<CryptoTableProps> = ({ showSearch, searchQuery, setSearchQuery }) => {
   const [cryptos, setCryptos] = useState<Cryptocurrency[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState<string>('');
   const [kwePrice, setKwePrice] = useState<number>(0);
 
   useEffect(() => {
