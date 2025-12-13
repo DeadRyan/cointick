@@ -44,7 +44,7 @@ const mockCryptos = [
 
 const mockKWEPriceResponse = {
   result: {
-    last: 0.0025,
+    last: '0.0025', // API returns string, not number
   },
 };
 

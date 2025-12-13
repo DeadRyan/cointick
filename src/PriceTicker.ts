@@ -1,6 +1,6 @@
 export interface KWEPriceResponse {
   result: {
-    last: number;
+    last: number | string;
   };
 }
 
@@ -13,5 +13,13 @@ export const fetchKWEPrice = async (): Promise<number> => {
   
   const data: KWEPriceResponse = await response.json();
   
-  return data.result.last || 0;
+  // Parse the value to ensure it's a number (API returns string)
+  const parsedPrice = parseFloat(data.result.last as any);
+  
+  // Return 0 if parsing fails (NaN) or if value is null/undefined
+  if (isNaN(parsedPrice)) {
+    return 0;
+  }
+  
+  return parsedPrice;
 };
