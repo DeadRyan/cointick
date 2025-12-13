@@ -109,6 +109,7 @@ const CryptoTable: React.FC<CryptoTableProps> = ({ showSearch }) => {
   }, []);
 
   // Update cryptos when KWE price changes
+  // Note: Only updates when kwePrice > 0 to avoid showing fallback/error values
   useEffect(() => {
     if (kwePrice > 0) {
       setCryptos(prevCryptos => {
@@ -148,7 +149,7 @@ const CryptoTable: React.FC<CryptoTableProps> = ({ showSearch }) => {
   };
 
   const formatPrice = (price: number): string => {
-    if (price == null) return 'N/A';
+    if (price == null || price === 0) return 'N/A';
     if (price >= 1) {
       return `$${price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     }
