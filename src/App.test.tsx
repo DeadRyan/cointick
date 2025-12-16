@@ -115,3 +115,57 @@ test('closes menu when Search menu item is clicked', async () => {
   // Menu should be closed
   expect(screen.queryByText('Search')).not.toBeInTheDocument();
 });
+
+test('renders disclaimer link', () => {
+  render(<App />);
+  const disclaimerLink = screen.getByText('Disclaimer');
+  expect(disclaimerLink).toBeInTheDocument();
+});
+
+test('opens disclaimer modal when disclaimer link is clicked', async () => {
+  render(<App />);
+  const disclaimerLink = screen.getByText('Disclaimer');
+  
+  // Modal should not be visible initially
+  expect(screen.queryByText('We do not collect personal information.')).not.toBeInTheDocument();
+  
+  // Click disclaimer link
+  await userEvent.click(disclaimerLink);
+  
+  // Modal should now be visible - check for modal header specifically
+  expect(screen.getByRole('heading', { name: 'Disclaimer' })).toBeInTheDocument();
+  expect(screen.getByText('We do not collect personal information.')).toBeInTheDocument();
+  expect(screen.getByText('Close')).toBeInTheDocument();
+});
+
+test('closes disclaimer modal when close button is clicked', async () => {
+  render(<App />);
+  const disclaimerLink = screen.getByText('Disclaimer');
+  
+  // Open modal
+  await userEvent.click(disclaimerLink);
+  expect(screen.getByText('We do not collect personal information.')).toBeInTheDocument();
+  
+  // Click close button
+  const closeButton = screen.getByText('Close');
+  await userEvent.click(closeButton);
+  
+  // Modal should be closed
+  expect(screen.queryByText('We do not collect personal information.')).not.toBeInTheDocument();
+});
+
+test('closes disclaimer modal when clicking overlay', async () => {
+  render(<App />);
+  const disclaimerLink = screen.getByText('Disclaimer');
+  
+  // Open modal
+  await userEvent.click(disclaimerLink);
+  expect(screen.getByText('We do not collect personal information.')).toBeInTheDocument();
+  
+  // Click overlay (the modal overlay div)
+  const overlay = screen.getByText('We do not collect personal information.').closest('.disclaimer-modal-overlay');
+  await userEvent.click(overlay!);
+  
+  // Modal should be closed
+  expect(screen.queryByText('We do not collect personal information.')).not.toBeInTheDocument();
+});

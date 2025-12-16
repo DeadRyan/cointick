@@ -262,3 +262,77 @@ code {
     font-size: 0.85rem;
   }
 }
+
+/* Footer */
+.footer {
+  text-align: center;
+  padding: 20px;
+  background-color: #0d0d0d;
+  border-top: 1px solid #2a2a2a;
+  margin-top: 30px;
+}
+
+.disclaimer-link {
+  background: none;
+  border: none;
+  color: #a0a0a0;
+  font-size: 0.9rem;
+  cursor: pointer;
+  text-decoration: underline;
+  transition: color 0.2s;
+}
+
+.disclaimer-link:hover {
+  color: #ffffff;
+}
+
+/* Disclaimer Modal */
+.disclaimer-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.disclaimer-modal {
+  background-color: #1a1a1a;
+  border-radius: 8px;
+  padding: 30px;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  border: 1px solid #2a2a2a;
+}
+
+.disclaimer-modal h3 {
+  margin: 0 0 15px 0;
+  color: #ffffff;
+  font-size: 1.2rem;
+}
+
+.disclaimer-modal p {
+  margin: 0 0 20px 0;
+  color: #a0a0a0;
+  line-height: 1.5;
+}
+
+.disclaimer-close {
+  background-color: #3861fb;
+  color: #ffffff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
+}
+
+.disclaimer-close:hover {
+  background-color: #2a4fd1;
+}

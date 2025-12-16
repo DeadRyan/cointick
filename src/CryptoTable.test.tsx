@@ -6,7 +6,7 @@ import CryptoTable from './CryptoTable';
 // Mock fetch API
 global.fetch = jest.fn();
 
-const mockCryptos = [
+const mockCryptosPage1 = [
   {
     id: 'bitcoin',
     name: 'Bitcoin',
@@ -42,6 +42,59 @@ const mockCryptos = [
   },
 ];
 
+const mockCryptosPage2 = [
+  {
+    id: 'solana',
+    name: 'Solana',
+    symbol: 'sol',
+    image: 'https://example.com/solana.png',
+    current_price: 100,
+    price_change_percentage_24h: 3.0,
+    market_cap: 30000000000,
+    total_volume: 5000000000,
+    market_cap_rank: 4,
+  },
+  {
+    id: 'polkadot',
+    name: 'Polkadot',
+    symbol: 'dot',
+    image: 'https://example.com/polkadot.png',
+    current_price: 20,
+    price_change_percentage_24h: 1.0,
+    market_cap: 20000000000,
+    total_volume: 1000000000,
+    market_cap_rank: 5,
+  },
+];
+
+const mockCryptosPage3 = [
+  {
+    id: 'chainlink',
+    name: 'Chainlink',
+    symbol: 'link',
+    image: 'https://example.com/chainlink.png',
+    current_price: 15,
+    price_change_percentage_24h: -2.0,
+    market_cap: 10000000000,
+    total_volume: 800000000,
+    market_cap_rank: 6,
+  },
+];
+
+const mockCryptosPage4 = [
+  {
+    id: 'avalanche',
+    name: 'Avalanche',
+    symbol: 'avax',
+    image: 'https://example.com/avalanche.png',
+    current_price: 50,
+    price_change_percentage_24h: 4.0,
+    market_cap: 15000000000,
+    total_volume: 2000000000,
+    market_cap_rank: 7,
+  },
+];
+
 const mockKWEPriceResponse = {
   result: {
     last: '0.0025', // API returns string, not number
@@ -49,10 +102,12 @@ const mockKWEPriceResponse = {
 };
 
 describe('CryptoTable', () => {
-  const mockSetSearchQuery = jest.fn();
+  const TestWrapper = ({ showSearch = true, initialSearchQuery = '' }: { showSearch?: boolean; initialSearchQuery?: string }) => {
+    const [searchQuery, setSearchQuery] = React.useState(initialSearchQuery);
+    return <CryptoTable showSearch={showSearch} searchQuery={searchQuery} setSearchQuery={setSearchQuery} />;
+  };
+
   beforeEach(() => {
-    // Default mock for APIs
-    (global.fetch as jest.Mock).mockImplementation((url: string) => {
       if (url.startsWith('https://kwepriceticker.com')) {
         // Mock KWE Price Ticker API response
         return Promise.resolve({
@@ -75,17 +130,36 @@ describe('CryptoTable', () => {
           }),
         });
       }
-      // Mock CoinGecko API response - all 4 pages return the same mock data
+      // Mock CoinGecko API response - return different data for different pages
       if (url.startsWith('https://api.coingecko.com')) {
+        const urlObj = new URL(url);
+        const page = parseInt(urlObj.searchParams.get('page') || '1');
+        let mockData;
+        switch (page) {
+          case 1:
+            mockData = mockCryptosPage1;
+            break;
+          case 2:
+            mockData = mockCryptosPage2;
+            break;
+          case 3:
+            mockData = mockCryptosPage3;
+            break;
+          case 4:
+            mockData = mockCryptosPage4;
+            break;
+          default:
+            mockData = [];
+        }
         return Promise.resolve({
           ok: true,
-          json: async () => mockCryptos,
+          json: async () => mockData,
         });
       }
       // Fallback
       return Promise.resolve({
         ok: true,
-        json: async () => mockCryptos,
+        json: async () => mockCryptosPage1,
       });
     });
   });
@@ -259,7 +333,7 @@ describe('CryptoTable', () => {
       }
       return Promise.resolve({
         ok: true,
-        json: async () => mockCryptos,
+        json: async () => mockCryptosPage1,
       });
     });
 

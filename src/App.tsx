@@ -5,6 +5,7 @@ function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [showDisclaimer, setShowDisclaimer] = useState(false);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -19,6 +20,14 @@ function App() {
     setSearchQuery('');
     setShowSearch(false);
     setIsMenuOpen(false);
+  };
+
+  const handleDisclaimerClick = () => {
+    setShowDisclaimer(true);
+  };
+
+  const closeDisclaimer = () => {
+    setShowDisclaimer(false);
   };
 
   return (
@@ -49,6 +58,29 @@ function App() {
         )}
       </header>
       <CryptoTable showSearch={showSearch} searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+      
+      {/* Disclaimer Link */}
+      <footer className="footer">
+        <button 
+          className="disclaimer-link" 
+          onClick={handleDisclaimerClick}
+        >
+          Disclaimer
+        </button>
+      </footer>
+
+      {/* Disclaimer Modal */}
+      {showDisclaimer && (
+        <div className="disclaimer-modal-overlay" onClick={closeDisclaimer}>
+          <div className="disclaimer-modal" onClick={(e) => e.stopPropagation()}>
+            <h3>Disclaimer</h3>
+            <p>We do not collect personal information.</p>
+            <button className="disclaimer-close" onClick={closeDisclaimer}>
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
