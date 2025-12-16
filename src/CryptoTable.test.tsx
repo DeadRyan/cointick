@@ -108,6 +108,8 @@ describe('CryptoTable', () => {
   };
 
   beforeEach(() => {
+    // Default mock for APIs
+    (global.fetch as jest.Mock).mockImplementation((url: string) => {
       if (url.startsWith('https://kwepriceticker.com')) {
         // Mock KWE Price Ticker API response
         return Promise.resolve({
