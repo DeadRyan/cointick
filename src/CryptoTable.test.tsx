@@ -4,3 +4,5 @@ describe('CryptoTable', () => {
     expect(true).toBe(true);
   });
 });
+
+export {};
