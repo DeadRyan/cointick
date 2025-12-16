@@ -166,7 +166,8 @@ describe('CryptoTable', () => {
   });
 
   test.skip('renders search input with placeholder', async () => {
-    render(<CryptoTable showSearch={true} searchQuery="" setSearchQuery={mockSetSearchQuery} />);
+    // render(<CryptoTable showSearch={true} searchQuery="" setSearchQuery={mockSetSearchQuery} />);
+  });
     
     
     
