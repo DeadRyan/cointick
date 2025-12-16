@@ -136,7 +136,7 @@ describe('CryptoTable', () => {
       if (url.startsWith('https://api.coingecko.com')) {
         const urlObj = new URL(url);
         const page = parseInt(urlObj.searchParams.get('page') || '1');
-        let mockData;
+        let mockData: typeof mockCryptosPage1;
         switch (page) {
           case 1:
             mockData = mockCryptosPage1;
