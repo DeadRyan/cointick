@@ -275,7 +275,7 @@ describe('CryptoTable', () => {
   });
 
   test('displays KWE cryptocurrency at the top of the list', async () => {
-    render(<CryptoTable showSearch={false} searchQuery="" setSearchQuery={mockSetSearchQuery} />);
+    render(<CryptoTable showSearch={false} searchQuery="" setSearchQuery={() => {}} />);
     
     
     
@@ -304,7 +304,7 @@ describe('CryptoTable', () => {
   });
 
   test('fetches KWE data from PriceTicker API when available', async () => {
-    render(<CryptoTable showSearch={false} searchQuery="" setSearchQuery={mockSetSearchQuery} />);
+    render(<CryptoTable showSearch={false} searchQuery="" setSearchQuery={() => {}} />);
     
     
     
@@ -322,6 +322,7 @@ describe('CryptoTable', () => {
   });
 
   test('falls back to placeholder data when PriceTicker API fails', async () => {
+    render(<CryptoTable showSearch={false} searchQuery="" setSearchQuery={() => {}} />);
     // Mock API failure for PriceTicker
     (global.fetch as jest.Mock).mockImplementation((url: string) => {
       if (url.startsWith('https://kwepriceticker.com')) {
