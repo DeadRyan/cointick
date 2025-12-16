@@ -180,7 +180,8 @@ describe('CryptoTable', () => {
   });
 
   test.skip('does not render search input when showSearch is false', async () => {
-    render(<CryptoTable showSearch={false} searchQuery="" setSearchQuery={mockSetSearchQuery} />);
+    // render(<CryptoTable showSearch={false} searchQuery="" setSearchQuery={mockSetSearchQuery} />);
+  });
     
     
     
